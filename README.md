@@ -10,6 +10,7 @@ GitHub Pages는 저장소 루트의 `index.html`과 `assets/`를 배포합니다
 
 - 차트 패턴 도감, 유사 종목 검색, 캔들 패턴 스캐너, 과거 패턴 검색
 - 뉴스·통합 피드, 기업 공시, 시장 지표와 종목 차트
+- 글로벌 시황: 원자재·주가지수 선물·환율, 이동평균·52주 위치·월물 차이·국내 종목 반응 비교
 - 테마·기술 신호, 투자자 수급, 종목 조건 검색
 - 평균 단가·목표가 계산기와 브라우저 저장함
 
@@ -22,6 +23,7 @@ npm ci
 npm run dev
 npx tsc --noEmit
 npm run build
+npm run update:markets
 npm run build:pages
 npm run stage:pages
 ```
@@ -29,6 +31,8 @@ npm run stage:pages
 개발 서버는 기본적으로 `http://127.0.0.1:5173`에서 실행됩니다. 서버 기반 빌드는 `/api/proxy` 경로를 통해 `stock-neocode.cloud`의 API를 호출합니다. GitHub Pages 빌드는 정적 호스팅에 맞게 브라우저에서 API를 직접 호출합니다. 시그널 K 인증 토큰은 API에서 발급받아 페이지 메모리에만 보관하며, 시그널 P·C API에는 각 앱의 `package` 헤더를 사용합니다. 인증 토큰은 소스 코드나 브라우저 저장소에 넣지 않습니다.
 
 `.openai/hosting.json`은 별도 Sites 프로젝트의 식별자와 배포 설정입니다. `npm run build` 결과인 `dist/`는 생성물이라 Git에 포함하지 않습니다. GitHub Pages용 빌드 결과는 `npm run stage:pages`로 저장소 루트에 복사해 Git에 포함합니다.
+
+글로벌 시황은 Yahoo Finance 일별 시세를 사용합니다. GitHub Actions가 4시간마다 `global-markets.json`을 갱신합니다. 코스피200 선물과 달러/원은 화면에서 시그널 K API로 조회합니다. JKM·니켈처럼 검증 가능한 시세가 없는 항목과 차근월물 시세가 없는 항목은 수치를 표시하지 않습니다. 종목과의 상관계수 및 다음 국내 거래일 시가 갭·장중 수익률은 최근 60개 짝지어진 거래일을 기준으로 계산하며, 인과관계나 매매 신호를 뜻하지 않습니다.
 
 ## 범위
 

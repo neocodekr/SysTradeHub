@@ -1,10 +1,11 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { Activity, ArrowDownRight, ArrowRight, ArrowUpRight, BarChart3, Bell, Bookmark, BookOpen, CalendarDays, CandlestickChart, ChevronLeft, ChevronRight, CircleHelp, ExternalLink, Filter, Flame, Home, Menu, Newspaper, RefreshCw, Search, Settings2, SlidersHorizontal, Sparkles, TrendingUp, X } from "lucide-react";
+import { Activity, ArrowDownRight, ArrowRight, ArrowUpRight, BarChart3, Bell, Bookmark, BookOpen, CalendarDays, CandlestickChart, ChevronLeft, ChevronRight, CircleHelp, ExternalLink, Filter, Flame, Globe2, Home, Menu, Newspaper, RefreshCw, Search, Settings2, SlidersHorizontal, Sparkles, TrendingUp, X } from "lucide-react";
 import { Area, AreaChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
+import GlobalMarkets from "./global-markets";
 
-type Tab = "home" | "p" | "c" | "history" | "news" | "disclosure" | "market" | "conditions" | "supply" | "signals" | "tools" | "saved";
+type Tab = "home" | "p" | "c" | "history" | "news" | "disclosure" | "market" | "global" | "conditions" | "supply" | "signals" | "tools" | "saved";
 type Service = "p" | "c" | "k";
 type Obj = Record<string, any>;
 declare const __STATIC_DEPLOY__: boolean;
@@ -73,6 +74,7 @@ const nav: { id: Tab; label: string; group: string; icon: any }[] = [
   { id: "news", label: "뉴스·통합 피드", group: "information", icon: Newspaper },
   { id: "disclosure", label: "공시", group: "information", icon: Bell },
   { id: "market", label: "시장·종목", group: "information", icon: BarChart3 },
+  { id: "global", label: "글로벌 시황", group: "information", icon: Globe2 },
   { id: "conditions", label: "종목 조건 검색", group: "analysis", icon: Filter },
   { id: "supply", label: "투자자 수급", group: "information", icon: Sparkles },
   { id: "signals", label: "테마·기술 신호", group: "analysis", icon: TrendingUp },
@@ -118,6 +120,7 @@ export default function HomePage() {
         {tab === "news" && <NewsFeed refresh={refresh} save={save} saved={saved}/>}
         {tab === "disclosure" && <Disclosures refresh={refresh} save={save} saved={saved}/>}
         {tab === "market" && <Market refresh={refresh} save={save} saved={saved}/>}
+        {tab === "global" && <GlobalMarketsScreen refresh={refresh}/>}
         {tab === "conditions" && <Conditions refresh={refresh} save={save} saved={saved}/>}
         {tab === "supply" && <Supply refresh={refresh} save={save} saved={saved}/>}
         {tab === "signals" && <Signals refresh={refresh} save={save} saved={saved}/>}
@@ -125,8 +128,13 @@ export default function HomePage() {
         {tab === "saved" && <Saved entries={saved} save={save}/>}
       </div>
     </main>
-    <nav className="bottom-nav" aria-label="모바일 메뉴">{[{ id: "home", label: "홈", icon: Home }, { id: "p", label: "차트", icon: Activity }, { id: "c", label: "캔들", icon: CandlestickChart }, { id: "news", label: "뉴스", icon: Newspaper }, { id: "market", label: "시장", icon: BarChart3 }].map(({ id, label, icon: Icon }) => <button key={id} className={tab === id ? "active" : ""} onClick={() => select(id as Tab)}><Icon size={20}/><span>{label}</span></button>)}</nav>
+    <nav className="bottom-nav" aria-label="모바일 메뉴">{[{ id: "home", label: "홈", icon: Home }, { id: "p", label: "차트", icon: Activity }, { id: "c", label: "캔들", icon: CandlestickChart }, { id: "news", label: "뉴스", icon: Newspaper }, { id: "global", label: "글로벌", icon: Globe2 }].map(({ id, label, icon: Icon }) => <button key={id} className={tab === id ? "active" : ""} onClick={() => select(id as Tab)}><Icon size={20}/><span>{label}</span></button>)}</nav>
   </div>;
+}
+
+function GlobalMarketsScreen({ refresh }: { refresh: number }) {
+  const market = useApi("k", "MajorMarketIndex", {}, refresh);
+  return <GlobalMarkets refresh={refresh} indices={items(market.data)} indicesLoading={market.loading}/>;
 }
 
 function Dashboard({ refresh, select }: { refresh: number; select: (tab: Tab) => void }) {
