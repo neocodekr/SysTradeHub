@@ -1,5 +1,9 @@
 # SysTradeHub
 
+**웹앱 접속:** [SysTradeHub 열기](https://systradehub.neocode-test3.chatgpt.site/)
+
+이 GitHub 저장소는 소스 코드와 설명 문서를 보여줍니다. 위 링크가 실행 중인 웹앱 주소입니다. 현재 웹앱은 ChatGPT 로그인이 필요한 비공개 사이트입니다.
+
 시그널 P, 시그널 C, 시그널 K의 주식 데이터와 분석 기능을 모은 반응형 웹앱입니다. 모바일에서는 하단 탭으로 탐색할 수 있습니다.
 
 ## 주요 기능
