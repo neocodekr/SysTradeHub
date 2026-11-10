@@ -1,8 +1,8 @@
 # SysTradeHub
 
-**웹앱 접속:** [SysTradeHub 열기](https://systradehub.neocode-test3.chatgpt.site/)
+**웹앱 접속:** [systradehub.com](https://systradehub.com/)
 
-이 GitHub 저장소는 소스 코드와 설명 문서를 보여줍니다. 위 링크가 실행 중인 웹앱 주소입니다. 현재 웹앱은 ChatGPT 로그인이 필요한 비공개 사이트입니다.
+GitHub Pages는 저장소 루트의 `index.html`과 `assets/`를 배포합니다. 이 저장소의 README는 GitHub 저장소 설명입니다.
 
 시그널 P, 시그널 C, 시그널 K의 주식 데이터와 분석 기능을 모은 반응형 웹앱입니다. 모바일에서는 하단 탭으로 탐색할 수 있습니다.
 
@@ -22,11 +22,13 @@ npm ci
 npm run dev
 npx tsc --noEmit
 npm run build
+npm run build:pages
+npm run stage:pages
 ```
 
-개발 서버는 기본적으로 `http://127.0.0.1:5173`에서 실행됩니다. 프론트엔드는 `/api/proxy` 서버 경로를 통해 `stock-neocode.cloud`의 API를 호출합니다. 브라우저별 ID를 만들어 시그널 K 인증 토큰을 서버에서 발급받고, 시그널 P·C API에는 각 앱의 `package` 헤더를 사용합니다. 인증 토큰은 소스 코드나 브라우저 저장소에 넣지 않습니다.
+개발 서버는 기본적으로 `http://127.0.0.1:5173`에서 실행됩니다. 서버 기반 빌드는 `/api/proxy` 경로를 통해 `stock-neocode.cloud`의 API를 호출합니다. GitHub Pages 빌드는 정적 호스팅에 맞게 브라우저에서 API를 직접 호출합니다. 시그널 K 인증 토큰은 API에서 발급받아 페이지 메모리에만 보관하며, 시그널 P·C API에는 각 앱의 `package` 헤더를 사용합니다. 인증 토큰은 소스 코드나 브라우저 저장소에 넣지 않습니다.
 
-`.openai/hosting.json`은 현재 Sites 프로젝트의 식별자와 배포 설정입니다. `npm run build` 결과인 `dist/`는 생성물이라 Git에 포함하지 않습니다.
+`.openai/hosting.json`은 별도 Sites 프로젝트의 식별자와 배포 설정입니다. `npm run build` 결과인 `dist/`는 생성물이라 Git에 포함하지 않습니다. GitHub Pages용 빌드 결과는 `npm run stage:pages`로 저장소 루트에 복사해 Git에 포함합니다.
 
 ## 범위
 

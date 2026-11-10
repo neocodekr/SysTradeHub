@@ -7,6 +7,10 @@ import { Area, AreaChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YA
 type Tab = "home" | "p" | "c" | "history" | "news" | "disclosure" | "market" | "conditions" | "supply" | "signals" | "tools" | "saved";
 type Service = "p" | "c" | "k";
 type Obj = Record<string, any>;
+declare const __STATIC_DEPLOY__: boolean;
+const staticDeploy = typeof __STATIC_DEPLOY__ !== "undefined" && __STATIC_DEPLOY__;
+const apiOrigin = "https://stock-neocode.cloud";
+const browserTokens = new Map<string, { token: string; until: number }>();
 
 function deviceId() {
   if (typeof window === "undefined") return "";
@@ -17,10 +21,30 @@ function deviceId() {
 async function api(service: Service, path: string, params: Record<string, string | number | undefined> = {}, body?: Obj) {
   const query = new URLSearchParams();
   Object.entries(params).forEach(([key, value]) => { if (value !== undefined && value !== "") query.set(key, String(value)); });
-  const response = await fetch(`/api/proxy/${service}/${path}${query.size ? `?${query}` : ""}`, {
-    method: body ? "POST" : "GET", headers: { "x-device-id": deviceId(), ...(body ? { "content-type": "application/json" } : {}) },
-    body: body ? JSON.stringify(body) : undefined, cache: "no-store",
-  });
+  let response: Response;
+  if (staticDeploy) {
+    const headers: Record<string, string> = { accept: "application/json" };
+    if (service === "k") {
+      const id = deviceId();
+      const cached = browserTokens.get(id);
+      if (cached && cached.until > Date.now() + 120000) headers.authorization = `Bearer ${cached.token}`;
+      else {
+        const auth = await fetch(`${apiOrigin}/api/Auth/token`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ key: id }), cache: "no-store" });
+        if (!auth.ok) throw new Error(`인증 요청 실패 (${auth.status})`);
+        const data = await auth.json() as { token?: string; expiresInMinutes?: number };
+        if (!data.token) throw new Error("인증 토큰이 없습니다.");
+        browserTokens.set(id, { token: data.token, until: Date.now() + (data.expiresInMinutes || 30) * 60000 });
+        headers.authorization = `Bearer ${data.token}`;
+      }
+    } else headers.package = service === "p" ? "com.neocode.signalp" : "com.neocode.signalc";
+    if (body) headers["content-type"] = "application/json";
+    response = await fetch(`${apiOrigin}/api/${path}${query.size ? `?${query}` : ""}`, { method: body ? "POST" : "GET", headers, body: body ? JSON.stringify(body) : undefined, cache: "no-store" });
+  } else {
+    response = await fetch(`/api/proxy/${service}/${path}${query.size ? `?${query}` : ""}`, {
+      method: body ? "POST" : "GET", headers: { "x-device-id": deviceId(), ...(body ? { "content-type": "application/json" } : {}) },
+      body: body ? JSON.stringify(body) : undefined, cache: "no-store",
+    });
+  }
   const data = await response.json().catch(() => ({})) as Obj;
   if (!response.ok) throw new Error(data.error || data.message || `요청 실패 (${response.status})`);
   return data;
