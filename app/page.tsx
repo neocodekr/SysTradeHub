@@ -106,7 +106,6 @@ export default function HomePage() {
     <aside className={`sidebar ${mobileMenu ? "show" : ""}`}>
       <div className="brand"><div className="brand-mark"><Activity size={23}/></div><div><strong>SysTradeHub</strong><span>STOCK INTELLIGENCE</span></div><button className="mobile-close" onClick={() => setMobileMenu(false)} aria-label="메뉴 닫기"><X size={20}/></button></div>
       <div className="side-section"><span className="side-caption">WORKSPACE</span>{nav.map(({ id, label, icon: Icon }, i) => <button key={id} className={`nav-item ${tab === id ? "active" : ""} ${i === 1 || i === 3 || i === 6 ? "space-top" : ""}`} onClick={() => select(id)}><Icon size={18}/><span>{label}</span>{tab === id && <span className="active-dot"/>}</button>)}</div>
-      <div className="side-bottom"><span className="live-dot"/> 실시간 데이터 연동 <small>시그널 P · C · K</small></div>
     </aside>
     {mobileMenu && <div className="scrim" onClick={() => setMobileMenu(false)}/>}
     <main className="main">
